@@ -1,34 +1,31 @@
 package main
 
 import (
-	"sync"
+	"fmt"
 )
 
 func main() {
-	readyQueue := make(chan *Process, 10)
-	blockedQueue := make(chan *Process, 10)
-	cpu := make(chan *Process)
-	output := make(chan string)
-
-	dispatcher := &Dispatcher{
-		ReadyQueue:   readyQueue,
-		BlockedQueue: blockedQueue,
-		CPU:          cpu,
-		Output:       output,
+	// Charger le fichier d'ordre de création
+	orders, err := LoadCreationOrder("order.txt")
+	if err != nil {
+		fmt.Println("Erreur :", err)
+		return
 	}
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	go dispatcher.Dispatch(4, &wg)
+	// Créer le dispatcher
+	dispatcher := NewDispatcher()
 
-	// Simula la creación de procesos y ejecución
-	process1 := &Process{
-		ID:            "Proceso_1",
-		State:         "Listo",
-		ProgramCounter: 0,
-		Instructions:   []string{"I", "I", "ES 3", "I", "F"},
+	// Exécuter les processus avec les ordres de création
+	for {
+
+		dispatcher.ExecuteProcesses(5, orders)
+
+		if len(dispatcher.ReadyQueue) == 0 && len(dispatcher.BlockedQueue) == 0 {
+			fmt.Println("Toutes les files sont vides. Fin de la simulation.")
+			break
+		}
 	}
-	readyQueue <- process1
 
-	wg.Wait()
+	WriteLogToFile("execution_log.txt")
+
 }
