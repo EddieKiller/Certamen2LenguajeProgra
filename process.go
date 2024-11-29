@@ -7,13 +7,13 @@ import (
 	"strings"
 )
 
-// Structure d'un processus
+// Estructura de un proceso
 type Process struct {
-	ID             int      // Identifiant du processus
-	State          string   // État du processus : "Ready", "Blocked", etc.
-	ProgramCounter int      // Ligne actuelle d'exécution
-	IOState        int      // Temps restant pour débloquer (si applicable)
-	Instructions   []string // Liste des instructions
+	ID             int      // Identificador de proceso
+	State          string   // Estado de un proceso [Blocked, Ready,...]
+	ProgramCounter int      // Linea actual de ejecución
+	IOState        int      // Tiempo restante para desbloquear (si es que aplica)
+	Instructions   []string // Lista de instrucciones
 }
 
 // Créer un nouveau processus

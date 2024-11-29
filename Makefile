@@ -1,8 +1,7 @@
 build:
-	go build -o simulator main.go dispatcher.go process.go
+	go build main.go dispatcher.go process.go
 
 run:
-	./simulator 5 10 order.txt
+	./process
 
-clean:
-	rm -f simulator
+

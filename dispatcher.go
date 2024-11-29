@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-var AsignarID int = 1 // Identifiant du processus
+var AsignarID int = 1
 var currentTime int = 1
 var executionLog []string
 
@@ -17,17 +17,17 @@ func AddToLog(time int, instruction, component string, pc int) {
 	executionLog = append(executionLog, logEntry)
 }
 
-// Structure représentant un ordre de création
+// Estructura de orden creacion
 type CreationOrder struct {
-	Time  int      // Temps de création
-	Files []string // Liste des fichiers de processus
+	Time  int      // Tiempo de creacion
+	Files []string // Lista de archivos de procesos
 }
 
 func LoadCreationOrder(filename string) ([]CreationOrder, error) {
-	fmt.Println("Lecture du fichier d'ordre :", filename)
+	fmt.Println("Lectura de archivo de orden creación :", filename)
 	file, err := os.Open(filename)
 	if err != nil {
-		return nil, fmt.Errorf("Erreur lors de l'ouverture du fichier : %w", err)
+		return nil, fmt.Errorf("Error durante la abertura del archivo : %w", err)
 	}
 	defer file.Close()
 
@@ -36,15 +36,15 @@ func LoadCreationOrder(filename string) ([]CreationOrder, error) {
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		fmt.Printf("Ligne brute lue : '%s'\n", line) // Débogage
+		//fmt.Printf("Ligne brute lue : '%s'\n", line) // Débogage
 
-		// Ignorer les lignes vides ou les commentaires
+		// Ignora linea de comentarios en caso de existir
 		if line == "" || strings.HasPrefix(line, "#") {
 			fmt.Println("Ligne ignorée :", line)
 			continue
 		}
 
-		// Séparer le temps de création et les fichiers
+		// Separa el tiempo de creación del nombre del archivo
 		parts := strings.Fields(line)
 		if len(parts) < 2 {
 			fmt.Println("Ligne mal formatée, ignorée :", line)
@@ -58,15 +58,15 @@ func LoadCreationOrder(filename string) ([]CreationOrder, error) {
 		}
 
 		files := parts[1:]                                     // Le reste sont les fichiers de processus
-		fmt.Printf("Temps : %d, Fichiers : %v\n", time, files) // Débogage
+		fmt.Printf("Tiempo : %d, Archivo : %v\n", time, files) // Débogage
 		orders = append(orders, CreationOrder{Time: time, Files: files})
 	}
 
 	if err := scanner.Err(); err != nil {
-		return nil, fmt.Errorf("Erreur lors de la lecture du fichier : %w", err)
+		return nil, fmt.Errorf("Error en la lectura del archivo : %w", err)
 	}
 
-	fmt.Println("Ordres chargés :", orders) // Résultat final
+	fmt.Println("Orden de carga :", orders) // Résultat final
 	return orders, nil
 }
 
@@ -77,7 +77,7 @@ func (d *Dispatcher) HandleCreationOrders(orders []CreationOrder, currentTime in
 			for _, file := range order.Files {
 				process, err := LoadProcessFile(AsignarID, file)
 				if err != nil {
-					fmt.Printf("Erreur lors du chargement du fichier de processus %s : %s\n", file, err)
+					fmt.Printf("Error en la carga de archivo de proceso %s : %s\n", file, err)
 					continue
 				}
 				d.AddToReadyQueue(process)
@@ -105,13 +105,13 @@ func NewDispatcher() *Dispatcher {
 
 // Ajouter un processus à la file Ready
 func (d *Dispatcher) AddToReadyQueue(process Process) {
-	fmt.Printf("Ajout du processus %d à la file Ready\n", process.ID)
+	fmt.Printf("Añadir el proceso %d a la cola Ready\n", process.ID)
 	d.ReadyQueue = append(d.ReadyQueue, process)
 }
 
 // Ajouter un processus à la file Blocked
 func (d *Dispatcher) AddToBlockedQueue(process Process) {
-	fmt.Printf("Ajout du processus %d à la file Blocked\n", process.ID)
+	fmt.Printf("Añadir el proceso %d a la cola Blocked\n", process.ID)
 	d.BlockedQueue = append(d.BlockedQueue, process)
 }
 
@@ -136,10 +136,10 @@ func (d *Dispatcher) PullFromBlockedQueue() {
 		process := &d.BlockedQueue[i]
 		if process.IOState > 0 {
 			process.IOState-- // Réduire le temps de blocage
-			fmt.Printf("Processus %d: Temps de blocage restant %d\n", process.ID, process.IOState)
+			fmt.Printf("Proceso %d: Tiempo de bloqueo restante %d\n", process.ID, process.IOState)
 		}
 		if process.IOState == 0 {
-			fmt.Printf("Processus %d débloqué, déplacement vers ReadyQueue\n", process.ID)
+			fmt.Printf("Proceso %d desbloqueado, Movido a la ReadyQueue\n", process.ID)
 			d.AddToReadyQueue(*process)
 			// Supprimer le processus débloqué de BlockedQueue
 			d.BlockedQueue = append(d.BlockedQueue[:i], d.BlockedQueue[i+1:]...)
@@ -156,7 +156,7 @@ func (d *Dispatcher) HandleBlockedProcesses() {
 		if process.IOState > 0 {
 			process.IOState-- // Réduire le temps de blocage
 			if process.IOState == 0 {
-				fmt.Printf("Le processus %d est débloqué\n", process.ID)
+				fmt.Printf("El proceso %d se desbloqueó\n", process.ID)
 				d.AddToReadyQueue(*process)
 				d.BlockedQueue = append(d.BlockedQueue[:i], d.BlockedQueue[i+1:]...)
 				continue
@@ -168,7 +168,7 @@ func (d *Dispatcher) HandleBlockedProcesses() {
 
 func (d *Dispatcher) ExecuteProcesses(cycles int, orders []CreationOrder) {
 	for cycles > 0 {
-		fmt.Println("Cycle de processeur :", cycles)
+		fmt.Println("Ciclo de proceso :", cycles)
 
 		// Gérer les ordres de création à l'instant courant
 		d.HandleCreationOrders(orders, currentTime)
@@ -179,37 +179,37 @@ func (d *Dispatcher) ExecuteProcesses(cycles int, orders []CreationOrder) {
 		// Retirer un processus de la file Ready
 		process, ok := d.PullFromReadyQueue()
 		if !ok {
-			fmt.Println("Aucun processus prêt à exécuter")
+			fmt.Println("No hay procesos para ejecutar")
 			cycles--
 			currentTime++
 			continue
 		}
 
 		// Exécuter le processus
-		fmt.Printf("Exécution du processus %d\n", process.ID)
+		fmt.Printf("Ejecución de proceso %d\n", process.ID)
 
-		AddToLog(currentTime, "EXEC", fmt.Sprintf("nombre_proceso_%d", process.ID), process.ProgramCounter)
+		AddToLog(currentTime, "EXEC", fmt.Sprintf("process_%d", process.ID), process.ProgramCounter)
 		currentTime++
 		for cycles > 0 && process.ProgramCounter < len(process.Instructions) {
 			instruction := process.Instructions[process.ProgramCounter]
-			fmt.Printf("Instruction exécutée : %s\n", instruction)
+			fmt.Printf("Instrucción a ejecutar : %s\n", instruction)
 			process.ProgramCounter++
 
 			// Ajouter l'instruction au log
-			AddToLog(currentTime, instruction, fmt.Sprintf("nombre_proceso_%d", process.ID), process.ProgramCounter)
+			AddToLog(currentTime, instruction, fmt.Sprintf("process_%d", process.ID), process.ProgramCounter)
 
 			if instruction == "F" {
-				fmt.Printf("Le processus %d est terminé\n", process.ID)
-				AddToLog(currentTime, "END", fmt.Sprintf("nombre_proceso_%d", process.ID), process.ProgramCounter)
+				fmt.Printf("El proceso %d terminó\n", process.ID)
+				AddToLog(currentTime, "END", fmt.Sprintf("process_%d", process.ID), process.ProgramCounter)
 				cycles--
 
 				break
 			} else if len(instruction) >= 2 && instruction[:2] == "ES" {
 				ioState := extractDelay(instruction)
-				fmt.Printf("Le processus %d est bloqué pour %d cycles\n", process.ID, ioState)
+				fmt.Printf("El proceso %d está bloqueado durante %d ciclos\n", process.ID, ioState)
 				process.IOState = ioState
 				d.AddToBlockedQueue(process)
-				AddToLog(currentTime, fmt.Sprintf("PUSH_Bloqueado nombre_proceso_%d", process.ID), "Dispatcher", process.ProgramCounter)
+				AddToLog(currentTime, fmt.Sprintf("PUSH_Bloqueado process_%d", process.ID), "Dispatcher", process.ProgramCounter)
 				currentTime++
 				break
 			}
@@ -221,7 +221,7 @@ func (d *Dispatcher) ExecuteProcesses(cycles int, orders []CreationOrder) {
 		// Ajouter le processus de retour à Ready si non terminé
 		if process.ProgramCounter < len(process.Instructions) && process.IOState == 0 {
 			d.AddToReadyQueue(process)
-			AddToLog(currentTime, fmt.Sprintf("PUSH_Listo nombre_proceso_%d", process.ID), "Dispatcher", process.ProgramCounter)
+			AddToLog(currentTime, fmt.Sprintf("PUSH_Listo process_%d", process.ID), "Dispatcher", process.ProgramCounter)
 			currentTime++
 		}
 
@@ -242,18 +242,18 @@ func extractDelay(instruction string) int {
 func WriteLogToFile(filename string) {
 	file, err := os.Create(filename)
 	if err != nil {
-		fmt.Println("Erreur lors de la création du fichier de log :", err)
+		fmt.Println("Error en la creación del archivo log :", err)
 		return
 	}
 	defer file.Close()
 
 	// Ajouter un en-tête
-	_, _ = file.WriteString("# Tiempo de CPU\tTipo Instrucción\tProceso/Despachador\tValor CP\n")
+	_, _ = file.WriteString("# Tiempo de CPU\tTipo Instrucción\tProceso\tDispatcher\tValor CP\n")
 
 	// Écrire chaque log
 	for _, logEntry := range executionLog {
 		_, _ = file.WriteString(logEntry + "\n")
 	}
 
-	fmt.Println("Fichier de log généré :", filename)
+	fmt.Println("Archivo log generado :", filename)
 }

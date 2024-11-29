@@ -1,35 +1,44 @@
-# Tiempo de CPU	Tipo Instrucción	Proceso/Despachador	Valor CP
+# Tiempo de CPU	Tipo Instrucción	Proceso	Dispatcher	Valor CP
 2	LOAD process1.txt	Dispatcher	0
 3	LOAD process2.txt	Dispatcher	0
 2	PULL	Dispatcher	0
-3	EXEC	nombre_proceso_1	0
-4	I	nombre_proceso_1	1
-5	ES 1	nombre_proceso_1	2
-5	PUSH_Bloqueado nombre_proceso_1	Dispatcher	2
-7	PULL	Dispatcher	0
-8	EXEC	nombre_proceso_2	0
-9	I	nombre_proceso_2	1
-10	I	nombre_proceso_2	2
-11	ES 1	nombre_proceso_2	3
-11	PUSH_Bloqueado nombre_proceso_2	Dispatcher	3
-13	PULL	Dispatcher	2
-14	EXEC	nombre_proceso_1	2
-15	I	nombre_proceso_1	3
-16	PUSH_Listo nombre_proceso_1	Dispatcher	3
-18	PULL	Dispatcher	3
-19	EXEC	nombre_proceso_2	3
-20	I	nombre_proceso_2	4
-21	I	nombre_proceso_2	5
-22	I	nombre_proceso_2	6
-23	F	nombre_proceso_2	7
-23	END	nombre_proceso_2	7
-24	PULL	Dispatcher	3
-25	EXEC	nombre_proceso_1	3
-26	I	nombre_proceso_1	4
-27	PUSH_Listo nombre_proceso_1	Dispatcher	4
-29	PULL	Dispatcher	4
-30	EXEC	nombre_proceso_1	4
-31	I	nombre_proceso_1	5
-32	I	nombre_proceso_1	6
-33	F	nombre_proceso_1	7
-33	END	nombre_proceso_1	7
+3	EXEC	process_1	0
+4	I	process_1	1
+5	I	process_1	2
+6	I	process_1	3
+7	I	process_1	4
+8	PUSH_Listo process_1	Dispatcher	4
+10	LOAD process4.txt	Dispatcher	0
+10	PULL	Dispatcher	0
+11	EXEC	process_2	0
+12	I	process_2	1
+13	I	process_2	2
+14	ES 1	process_2	3
+14	PUSH_Bloqueado process_2	Dispatcher	3
+16	PULL	Dispatcher	4
+17	EXEC	process_1	4
+18	I	process_1	5
+19	I	process_1	6
+20	F	process_1	7
+20	END	process_1	7
+21	PULL	Dispatcher	0
+22	EXEC	process_3	0
+23	I	process_3	1
+24	ES 5	process_3	2
+24	PUSH_Bloqueado process_3	Dispatcher	2
+26	PULL	Dispatcher	3
+27	EXEC	process_2	3
+28	I	process_2	4
+29	I	process_2	5
+30	I	process_2	6
+31	F	process_2	7
+31	END	process_2	7
+35	PULL	Dispatcher	2
+36	EXEC	process_3	2
+37	I	process_3	3
+38	I	process_3	4
+39	PUSH_Listo process_3	Dispatcher	4
+41	PULL	Dispatcher	4
+42	EXEC	process_3	4
+43	F	process_3	5
+43	END	process_3	5
